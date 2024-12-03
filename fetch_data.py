@@ -7,9 +7,10 @@ import time
 # Configuration
 API_ENDPOINT = "https://api.opendota.com/api/matches/{match_id}"
 API_KEY = "YOUR_OPENDOTA_API_KEY"  # Replace with your OpenDota API key, if needed
-LOCAL_SAVE_DIR = "/home/ad-magus-apex/Downloads/Q4/EDA/dota-stats/match_data/parsed_matches/parsed_match_data"  # Local directory to save JSON files
+LOCAL_SAVE_DIR = "/home/ad-magus-apex/Downloads/Q4/EDA/Dota-Stats/data/match_data/parsed_matches/parsed_match_data"  # Local directory to save JSON files
 RATE_LIMIT = 60  # Number of requests per minute
 
+# Fetched till match id: 8034875166, 8034779806, 8034611701, 8034479774, 8034441203, 8034051300, 8033743058, 8033624756
 def fetch_and_save_match_data(match_id):
     """Fetches match data from OpenDota API and saves it locally as a JSON file."""
     try:
@@ -20,7 +21,7 @@ def fetch_and_save_match_data(match_id):
         
         # Prepare filename and path
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"match_{match_id}_{timestamp}.json"
+        filename = f"match_{match_id}.json"
         #filename = "pubic_match_data.json"
         local_path = os.path.join(LOCAL_SAVE_DIR, filename)
         
@@ -30,10 +31,11 @@ def fetch_and_save_match_data(match_id):
         # Save data locally
         with open(local_path, 'w') as f:
             json.dump(match_data, f, indent=4)
-        print(f"Match data saved locally: {local_path}")
+        print(f"Match data saved locally: {local_path} {match_id}")
         
     except requests.exceptions.RequestException as e:
         print(f"Failed to fetch match data for match_id {match_id}: {e}")
+        return
 
 
 def fetch_and_save_match_ids(preferred_id, target_count=10000):
@@ -75,25 +77,27 @@ def fetch_and_save_match_ids(preferred_id, target_count=10000):
             print(f"Failed to fetch data. Status code: {response.status_code}")
             time.sleep(request_interval)
 
-    ids_dir_path = "/home/ad-magus-apex/Downloads/Q4/EDA/dota-stats/data/match_data/parsed_matches/parsed_match_ids_new.json"
+    ids_dir_path = "/home/ad-magus-apex/Downloads/Q4/EDA/Dota-Stats/data/match_data/parsed_matches/parsed_match_ids.json"
     # Save match IDs to file
     with open(ids_dir_path, "w") as f:
         json.dump(match_ids, f)
     print(f"Saved {target_count} match IDs")
 
 
-fetch_and_save_match_ids(preferred_id=8035007566)
+#fetch_and_save_match_ids(preferred_id=8033743058)
 
     
 def extract_match_ids():
     """Extracts match IDs from a locally stored JSON file."""
-    preferred_id = 8014987338
-    match_ids_path = f"match_data/parsed_matches/parsed_matches.json"
+    preferred_id = 8033743058
+    match_ids_path = f"data/match_data/parsed_matches/parsed_match_ids.json"
     with open(match_ids_path, 'r') as f:
         data = json.load(f)
     
     # Extract match IDs
-    match_ids = [match["match_id"] for match in data if "match_id" in match]
+    match_ids = data#["matches"]#[match["match_id"] for match in data if "match_id" in match]
+    index = match_ids.index(8033624756)
+    match_ids = match_ids[index:] 
     print(match_ids[0])
     # Print match IDs
     #print("Extracted match IDs:", match_ids)
@@ -115,5 +119,4 @@ def fetch_matches_in_sequence():
 start_match_id = 8008769471  # Replace with a valid starting match ID
 num_matches = 110  # Number of matches to fetch
 
-# fetch_matches_in_sequence()
-#fetch_and_save_match_data()
+fetch_matches_in_sequence()
